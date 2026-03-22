@@ -1,0 +1,16 @@
+// PHEME Ontology Diagram
+digraph {
+	dpi=300 rankdir=TB size="12,8"
+	node [fillcolor=lightblue shape=record style="rounded,filled"]
+	Event [label="{<head>Event||No properties|}}" tooltip="A real-world event that generates social media discussion."]
+	Post [label="{<head>Post||posted by: User|about event: Event|replies to: Post|in thread: ConversationThread|text: string|created at: dateTime|depth: integer|children count: integer|time since source: float|}}" tooltip="A social media post (tweet) in the PHEME dataset."]
+	User [label="{<head>User||No properties|}}" tooltip="A social media user who creates posts."]
+	ConversationThread [label="{<head>ConversationThread||has veracity: VeracityLabel|thread size: integer|max depth: integer|reply speed: float|}}" tooltip="A thread of conversation consisting of a root post and its replies."]
+	VeracityLabel [label="{<head>VeracityLabel||No properties|}}" tooltip="Label indicating whether a conversation thread is a rumor (1) or non-rumor (0)."]
+	n24490b6907ff4842b063f8740f5035e1b2 [label="{<head>n24490b6907ff4842b063f8740f5035e1b2||No properties|}}" tooltip=""]
+	Post -> User [label="posted by" arrowhead=open]
+	Post -> Event [label="about event" arrowhead=open]
+	Post -> Post [label="replies to" arrowhead=open]
+	Post -> ConversationThread [label="in thread" arrowhead=open]
+	ConversationThread -> VeracityLabel [label="has veracity" arrowhead=open]
+}
