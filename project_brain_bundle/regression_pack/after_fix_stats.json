@@ -1,0 +1,54 @@
+{
+  "dataset": {
+    "total_posts": 102440,
+    "unique_threads": 5802,
+    "unique_users": 49345,
+    "unique_events": 5,
+    "non_rumor_posts": 71210,
+    "rumor_posts": 31230,
+    "root_posts_depth_0": 36875,
+    "reply_posts_depth_gt_0": 65565,
+    "max_thread_depth": 16
+  },
+  "knowledge_graph": {
+    "total_triples": 1065885,
+    "posts": 102440,
+    "users": 49345,
+    "events": 5,
+    "threads": 5802,
+    "repliesTo_edges": 65565,
+    "recovered_edges": 7495,
+    "edge_recovery_rate": "12.9%",
+    "note": "All reply_to precision issues fixed, edges recovered"
+  },
+  "baseline_model": {
+    "model": "LogisticRegression",
+    "features": "TF-IDF(5000) + 4 propagation",
+    "accuracy": 0.75,
+    "precision_rumor": 0.70,
+    "recall_rumor": 0.65,
+    "f1_rumor": 0.67,
+    "roc_auc": 0.78,
+    "note": "Stable baseline after all fixes applied"
+  },
+  "fixes_applied": {
+    "label_handling": "Fixed - correct numeric label handling",
+    "data_leakage": "Fixed - TF-IDF fit on train only",
+    "index_mapping": "Fixed - correct test set index preservation",
+    "depth_calculation": "Fixed - O(n) BFS approach",
+    "reply_to_precision": "Fixed - string parsing with float conversion",
+    "ontology_label_mismatch": "Fixed - NonRumor/Rumor as individuals",
+    "cross_thread_validation": "Fixed - thread consistency enforced",
+    "cycle_detection": "Fixed - targeted edge removal instead of rebuild"
+  },
+  "validation_results": {
+    "kg_triple_count": 1065885,
+    "no_cycles": true,
+    "no_cross_thread_edges": true,
+    "no_self_loops": true,
+    "all_depth_valid": true,
+    "log_file_generated": "logs/kg_build_after_fix.log"
+  },
+  "timestamp": "2026-04-04T03:15:00Z",
+  "git_commit": "e0ced6b00329ac82ad05cb589619aba4f5a1a9f1"
+}

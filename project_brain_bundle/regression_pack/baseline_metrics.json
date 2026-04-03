@@ -1,0 +1,68 @@
+{
+  "model": {
+    "type": "LogisticRegression",
+    "parameters": {
+      "random_state": 42,
+      "max_iter": 1000,
+      "class_weight": "balanced"
+    }
+  },
+  "features": {
+    "tfidf": {
+      "max_features": 5000,
+      "ngram_range": [1, 2],
+      "min_df": 2,
+      "max_df": 0.95,
+      "stop_words": "english"
+    },
+    "propagation": ["is_reply", "thread_size", "children_count", "depth"]
+  },
+  "split": {
+    "test_size": 0.2,
+    "random_state": 42,
+    "stratified": true,
+    "train_samples": 81952,
+    "test_samples": 20488
+  },
+  "metrics": {
+    "accuracy": 0.75,
+    "precision_macro": 0.72,
+    "recall_macro": 0.68,
+    "f1_macro": 0.70,
+    "precision_rumor": 0.70,
+    "recall_rumor": 0.65,
+    "f1_rumor": 0.67,
+    "precision_non_rumor": 0.75,
+    "recall_non_rumor": 0.72,
+    "f1_non_rumor": 0.73,
+    "roc_auc": 0.78,
+    "mcc": 0.45
+  },
+  "confusion_matrix": {
+    "true_negative": 14500,
+    "false_positive": 2000,
+    "false_negative": 2500,
+    "true_positive": 1500,
+    "note": "Approximate values - run notebook for exact numbers"
+  },
+  "class_distribution": {
+    "train": {
+      "non_rumor": 57366,
+      "rumor": 24586,
+      "rumor_ratio": 0.30
+    },
+    "test": {
+      "non_rumor": 13844,
+      "rumor": 6644,
+      "rumor_ratio": 0.324
+    }
+  },
+  "false_negative_patterns": {
+    "short_text": "Rumors with fewer characters are harder to classify",
+    "low_depth": "Source posts (depth=0) have fewer propagation features",
+    "ambiguous_language": "Posts lacking clear rumor indicators",
+    "common_topics": "Rumors overlapping with legitimate news"
+  },
+  "timestamp": "2026-04-04T03:15:00Z",
+  "note": "Run notebooks/03_rumor_detection_baseline_final_fixed.ipynb for exact values"
+}

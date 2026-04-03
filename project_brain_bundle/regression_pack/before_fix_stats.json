@@ -1,0 +1,43 @@
+{
+  "dataset": {
+    "total_posts": 102440,
+    "unique_threads": 5802,
+    "unique_users": 49345,
+    "unique_events": 5,
+    "non_rumor_posts": 71210,
+    "rumor_posts": 31230,
+    "root_posts_depth_0": 36875,
+    "reply_posts_depth_gt_0": 65565,
+    "max_thread_depth": 16
+  },
+  "knowledge_graph": {
+    "total_triples": 1058390,
+    "posts": 102440,
+    "users": 49345,
+    "events": 5,
+    "threads": 5802,
+    "repliesTo_edges": 58070,
+    "broken_reply_edges": 7495,
+    "note": "reply_to precision loss caused 7495 broken edges"
+  },
+  "baseline_model": {
+    "model": "LogisticRegression",
+    "features": "TF-IDF(5000) + 4 propagation",
+    "accuracy": 0.75,
+    "precision_rumor": 0.70,
+    "recall_rumor": 0.65,
+    "f1_rumor": 0.67,
+    "roc_auc": 0.78,
+    "note": "Approximate values from baseline notebook"
+  },
+  "known_issues": {
+    "label_handling_bug": "Fixed - was causing ValueError: n_samples=0",
+    "data_leakage": "Fixed - TF-IDF was fit on full dataset",
+    "index_mapping_error": "Fixed - wrong test set mapping",
+    "depth_calculation_inefficiency": "Fixed - O(n^2) to O(n)",
+    "reply_to_precision_loss": "Fixed - float64 precision loss on tweet IDs",
+    "ontology_label_mismatch": "Fixed - NonRumor/Rumor treated as classes instead of individuals"
+  },
+  "timestamp": "2026-04-04T02:00:00Z",
+  "git_commit": "e0ced6b00329ac82ad05cb589619aba4f5a1a9f1"
+}

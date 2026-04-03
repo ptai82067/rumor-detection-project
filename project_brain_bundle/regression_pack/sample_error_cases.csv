@@ -1,0 +1,11 @@
+post_id,thread_id,true_label,predicted_label,error_type,text_preview,depth,thread_size,children_count
+498258870758699008,498235547685756928,1,0,false_negative,"Police have brought out the large gear in #Ferguson...",0,14,32
+498251391836913664,498248415223246848,1,0,false_negative,"The mother of the boy killed in #Ferguson speaking...",0,27,17
+498273992999202817,498248648699150336,1,0,false_negative,"This is about justice not revenge #Ferguson...",0,45,8
+498341247535181824,498251140296097794,1,0,false_negative,"RT @AntonioFrench: Time to stand up for what is right...",0,12,3
+498494841886883840,4982635980626616,1,0,false_negative,"Breaking: New evidence suggests cover-up in #Ferguson...",0,8,15
+498260457665613824,49825365275511194,1,0,false_negative,"Witnesses report hearing multiple gunshots...",0,23,7
+498274703526883328,49825365275511194,1,0,false_negative,"Community demands answers after peaceful protest...",0,23,4
+498284157551009793,49825365275511194,1,0,false_negative,"Local leaders call for federal investigation...",0,23,2
+498309372104019968,49825365275511194,1,0,false_negative,"National Guard deployed to restore order...",0,23,1
+498386487709548544,49825365275511194,1,0,false_negative,"Attorney General announces review of case...",0,23,0
