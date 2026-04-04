@@ -157,10 +157,31 @@ CONSTRAINTS:
 
 ## Execution Order
 
-1. **Task 1** (Feature Integration) - Must complete first
-2. **Task 2** (Experiment Comparison) - Depends on Task 1
-3. **Task 3** (Recall Analysis) - Depends on Task 2
-4. **Task 4** (Report Writing) - Depends on Tasks 2-3
+1. **Task 1** (Feature Integration) - ✅ COMPLETED
+2. **Task 2** (Experiment Comparison) - ✅ COMPLETED
+3. **Task 3** (Recall Analysis) - Partially completed (see 08_GRAPH_FEATURE_RESULTS.md)
+4. **Task 4** (Report Writing) - Partially completed (see 08_GRAPH_FEATURE_RESULTS.md)
+
+## Completion Status
+
+### Task 1: Feature Integration ✅ COMPLETED
+
+- Created `utils/graph_features.py` with full graph feature extraction
+- Extracts 14 graph features: node centrality, user reputation, thread structure, source authority
+- Successfully integrates with the baseline pipeline
+
+### Task 2: Experiment Comparison ✅ COMPLETED
+
+- Ran complete ablation study in `notebooks/04_graph_feature_integration.ipynb`
+- Results saved to `project_brain_bundle/regression_pack/graph_feature_experiments.json`
+- Best model (Exp3: All Graph Features) improves recall by +0.4%
+
+### Key Results
+
+- **Baseline Recall**: 0.773
+- **Best Model Recall**: 0.777 (+0.004)
+- **Best Model**: Exp3 (Baseline + All 14 Graph Features)
+- **Most Impactful Feature**: user_prior_rumor_ratio
 
 ## Key Reminders for Future Sessions
 

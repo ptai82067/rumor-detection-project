@@ -14,8 +14,18 @@ import logging
 from typing import Dict, Set
 import os
 
-# Set up logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+# Set up logging to both console and file
+log_file = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'logs', 'kg_build_after_fix.log')
+os.makedirs(os.path.dirname(log_file), exist_ok=True)
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(),
+        logging.FileHandler(log_file, mode='w', encoding='utf-8')
+    ]
+)
 logger = logging.getLogger(__name__)
 
 # Define namespaces
@@ -42,19 +52,26 @@ class KnowledgeGraphBuilder:
         self.created_users: Set[int] = set()
         self.created_events: Set[str] = set()
         self.created_threads: Set[int] = set()
-        self.created_labels: Set[int] = set()
         
         # Track valid post_ids for repliesTo validation
         self.valid_post_ids: Set[int] = set()
+        
+        # Track post metadata for structural validation: post_id -> (thread_id, depth)
+        self.post_metadata: Dict[int, tuple] = {}
     
     def load_data(self, file_path: str) -> pd.DataFrame:
         """Load the processed PHEME features dataset."""
         logger.info(f"Loading data from {file_path}")
-        df = pd.read_csv(file_path)
+        # Load reply_to as string to preserve precision for large tweet IDs
+        # (float64 cannot precisely represent 18-digit tweet IDs)
+        df = pd.read_csv(file_path, dtype={'reply_to': str})
         
         # Convert time to datetime if not already done
         if df['time'].dtype == 'object':
             df['time'] = pd.to_datetime(df['time'])
+        
+        # Clean up reply_to: replace 'nan' strings with actual NaN
+        df['reply_to'] = df['reply_to'].replace('nan', pd.NA)
         
         logger.info(f"Loaded {len(df)} posts across {df['thread_id'].nunique()} threads")
         return df
@@ -98,8 +115,6 @@ class KnowledgeGraphBuilder:
             return EX[f'event/{identifier}']
         elif entity_type == 'thread':
             return EX[f'thread/{identifier}']
-        elif entity_type == 'label':
-            return EX[f'label/{identifier}']
         else:
             raise ValueError(f"Unknown entity type: {entity_type}")
     
@@ -163,13 +178,48 @@ class KnowledgeGraphBuilder:
             # Non-root post: repliesTo MUST exist
             if pd.isna(reply_to):
                 logger.error(f"Inconsistent data: post {post_id} has depth={depth} but no repliesTo. This should not happen in a proper tree structure.")
-            elif int(reply_to) in self.valid_post_ids:
-                # Target post exists, create the relationship
-                reply_to_uri = self.create_uri('post', int(reply_to))
-                self.add_object_property(post_uri, EX.repliesTo, reply_to_uri)
             else:
-                # Target post does NOT exist, log warning and skip creating the triple
-                logger.warning(f"Broken repliesTo relationship: post {post_id} references non-existent parent post {int(reply_to)}")
+                # Parse reply_to safely: handle both string scientific notation and direct values
+                try:
+                    # Convert to float first to handle scientific notation strings, then to int
+                    parent_id = int(float(reply_to))
+                except (ValueError, TypeError):
+                    logger.error(f"Cannot parse reply_to value '{reply_to}' for post {post_id}")
+                    return
+                
+                if parent_id not in self.valid_post_ids:
+                    # Target post does NOT exist
+                    logger.warning(f"Broken repliesTo relationship: post {post_id} references non-existent parent post {parent_id}")
+                else:
+                    # Validate structural consistency using post metadata
+                    current_thread_id = int(row['thread_id'])
+                    parent_metadata = self.post_metadata.get(parent_id)
+                    
+                    if parent_metadata is None:
+                        logger.error(f"Missing metadata for parent post {parent_id}")
+                        return
+                    
+                    parent_thread_id, parent_depth = parent_metadata
+                    
+                    # Check 1: Parent must be in the same thread
+                    if parent_thread_id != current_thread_id:
+                        logger.warning(
+                            f"Cross-thread repliesTo violation: post {post_id} (thread {current_thread_id}) "
+                            f"references parent {parent_id} (thread {parent_thread_id}). Skipping edge."
+                        )
+                        return
+                    
+                    # Check 2: Parent depth must be strictly less than child depth
+                    if parent_depth >= depth:
+                        logger.warning(
+                            f"Depth violation: post {post_id} (depth {depth}) references parent {parent_id} "
+                            f"(depth {parent_depth}). Skipping edge."
+                        )
+                        return
+                    
+                    # All validations passed, create the relationship
+                    reply_to_uri = self.create_uri('post', parent_id)
+                    self.add_object_property(post_uri, EX.repliesTo, reply_to_uri)
     
     def process_user(self, user_id: int):
         """Process a user and add its triples to the graph."""
@@ -205,27 +255,30 @@ class KnowledgeGraphBuilder:
         self.add_data_property(thread_uri, EX.maxDepth, int(first_row['max_depth']), XSD.integer)
         self.add_data_property(thread_uri, EX.replySpeed, float(first_row['reply_speed_per_hour']), XSD.float)
         
-        # Add veracity label
+        # Add veracity label (NonRumor and Rumor are individuals per ontology)
         label_value = int(first_row['label'])
-        label_uri = self.create_uri('label', label_value)
-        
-        # Create label instance if not exists
-        if label_value not in self.created_labels:
-            if label_value == 0:
-                self.add_class_instance(label_uri, EX.NonRumor)
-            else:
-                self.add_class_instance(label_uri, EX.Rumor)
-            self.created_labels.add(label_value)
-        
+        if label_value == 0:
+            label_uri = EX.NonRumor
+        else:
+            label_uri = EX.Rumor
+
         self.add_object_property(thread_uri, EX.hasVeracity, label_uri)
     
     def build_knowledge_graph(self, df: pd.DataFrame):
         """Build the complete knowledge graph from the dataset."""
         logger.info("Building knowledge graph...")
         
-        # Step 1: Collect all valid post_ids for repliesTo validation
+        # Step 1: Collect all valid post_ids and their metadata for repliesTo validation
         self.valid_post_ids = set(df['post_id'].unique())
         logger.info(f"Collected {len(self.valid_post_ids)} valid post_ids for repliesTo validation")
+        
+        # Build post metadata lookup for structural validation
+        for _, row in df.iterrows():
+            post_id = int(row['post_id'])
+            thread_id = int(row['thread_id'])
+            depth = int(row['depth'])
+            self.post_metadata[post_id] = (thread_id, depth)
+        logger.info(f"Built metadata for {len(self.post_metadata)} posts for structural validation")
         
         # Step 2: Group by thread for efficient processing
         thread_groups = df.groupby('thread_id')
@@ -246,35 +299,30 @@ class KnowledgeGraphBuilder:
         logger.info(f"Entities created: {len(self.created_posts)} posts, {len(self.created_users)} users, "
                    f"{len(self.created_events)} events, {len(self.created_threads)} threads")
     
-    def detect_and_remove_cycles(self) -> bool:
-        """Detect and remove cycles in the reply tree graph using DFS."""
-        logger.info("Detecting and removing cycles in reply tree...")
-        
-        # Build adjacency list from repliesTo relationships
-        reply_graph = {}
-        reply_edges = []
-        
-        # Collect all repliesTo relationships
+    def _collect_reply_edges(self) -> list:
+        """Collect all repliesTo edges from the graph as (source_id, target_id, subject_uri, object_uri) tuples."""
+        edges = []
         for subject, predicate, obj in self.graph.triples((None, EX.repliesTo, None)):
-            if predicate == EX.repliesTo:
-                source_id = self.extract_post_id_from_uri(subject)
-                target_id = self.extract_post_id_from_uri(obj)
-                
-                # Skip if we couldn't extract valid IDs
-                if source_id is None or target_id is None:
-                    continue
-                
-                if source_id not in reply_graph:
-                    reply_graph[source_id] = []
-                reply_graph[source_id].append(target_id)
-                reply_edges.append((source_id, target_id))
+            source_id = self.extract_post_id_from_uri(subject)
+            target_id = self.extract_post_id_from_uri(obj)
+            if source_id is not None and target_id is not None:
+                edges.append((source_id, target_id, subject, obj))
+        return edges
+    
+    def _detect_cycle_edges(self, edges: list) -> list:
+        """Detect cycles and return list of edges to remove (without mutating the graph)."""
+        # Build adjacency list
+        reply_graph = {}
+        for source_id, target_id, _, _ in edges:
+            if source_id not in reply_graph:
+                reply_graph[source_id] = []
+            reply_graph[source_id].append(target_id)
         
-        logger.info(f"Analyzing {len(reply_edges)} reply relationships for cycles")
+        logger.info(f"Analyzing {len(edges)} reply relationships for cycles")
         
-        # Detect cycles using DFS
         visited = set()
         rec_stack = set()
-        cycles_found = []
+        edges_to_remove = set()  # Store (source_id, target_id) tuples to remove
         
         def dfs_detect_cycle(node_id):
             visited.add(node_id)
@@ -282,28 +330,20 @@ class KnowledgeGraphBuilder:
             
             # Check for self-loops
             if node_id in reply_graph and node_id in reply_graph[node_id]:
-                cycles_found.append([node_id, node_id])
                 logger.warning(f"Self-loop detected: post {node_id} → itself")
-                # Remove self-loop
-                reply_graph[node_id].remove(node_id)
+                edges_to_remove.add((node_id, node_id))
                 return True
             
             cycle_found = False
             if node_id in reply_graph:
-                for neighbor_id in reply_graph[node_id][:]:  # Use copy to allow modification
+                for neighbor_id in list(reply_graph[node_id]):  # Use list copy
                     if neighbor_id not in visited:
                         if dfs_detect_cycle(neighbor_id):
                             cycle_found = True
                     elif neighbor_id in rec_stack:
-                        # Cycle detected
-                        cycle_path = self.find_cycle_path(reply_graph, node_id, neighbor_id)
-                        cycles_found.append(cycle_path)
-                        logger.warning(f"Cycle detected: {' → '.join(map(str, cycle_path))} → {cycle_path[0]}")
-                        
-                        # Remove the problematic edge that closes the cycle
-                        if neighbor_id in reply_graph[node_id]:
-                            reply_graph[node_id].remove(neighbor_id)
-                            logger.info(f"Removed cycle edge: {node_id} → {neighbor_id}")
+                        # Cycle detected - mark edge for removal
+                        logger.warning(f"Cycle detected involving edge: {node_id} → {neighbor_id}")
+                        edges_to_remove.add((node_id, neighbor_id))
                         cycle_found = True
             
             rec_stack.remove(node_id)
@@ -314,14 +354,30 @@ class KnowledgeGraphBuilder:
             if node_id not in visited:
                 dfs_detect_cycle(node_id)
         
-        if cycles_found:
-            logger.warning(f"Found and removed {len(cycles_found)} cycles")
-            # Rebuild the graph without cycles
-            self.remove_cycle_edges_from_graph(reply_graph, reply_edges)
+        return list(edges_to_remove)
+    
+    def detect_and_remove_cycles(self) -> bool:
+        """Detect and remove cycles in the reply tree graph using DFS."""
+        logger.info("Detecting and removing cycles in reply tree...")
+        
+        # Step 1: Collect all reply edges
+        edges = self._collect_reply_edges()
+        
+        # Step 2: Detect cycle edges (without mutating graph)
+        edges_to_remove = self._detect_cycle_edges(edges)
+        
+        # Step 3: Remove only the problematic edges from the graph
+        if edges_to_remove:
+            logger.warning(f"Found and removing {len(edges_to_remove)} cycle edges")
+            for source_id, target_id in edges_to_remove:
+                source_uri = self.create_uri('post', source_id)
+                target_uri = self.create_uri('post', target_id)
+                self.graph.remove((source_uri, EX.repliesTo, target_uri))
+                logger.info(f"Removed cycle edge: {source_id} → {target_id}")
         else:
             logger.info("No cycles detected in reply tree")
         
-        return len(cycles_found) == 0
+        return len(edges_to_remove) == 0
     
     def extract_post_id_from_uri(self, uri: URIRef) -> int:
         """Extract post ID from URI string."""

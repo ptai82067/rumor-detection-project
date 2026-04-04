@@ -1,1 +1,0 @@
-# Knowledge graph module for rumor detection
