@@ -31,9 +31,9 @@ EX = Namespace("http://example.org/pheme#")
 def extract_post_id_from_uri(uri) -> Optional[int]:
     """Extract post ID from RDF URI."""
     uri_str = str(uri)
-    if '/post/' in uri_str:
+    if 'post/' in uri_str:
         try:
-            post_part = uri_str.split('/post/')[-1].split('#')[0].split('?')[0]
+            post_part = uri_str.split('post/')[-1].split('#')[0].split('?')[0]
             return int(post_part)
         except ValueError:
             logger.warning(f"Could not extract post ID from URI: {uri_str}")
@@ -244,8 +244,11 @@ def compute_source_authority_features(df: pd.DataFrame, user_features: pd.DataFr
     source_posts['source_user_credibility'] = 1 - source_posts['user_prior_rumor_ratio']
     source_posts['source_network_size'] = source_posts['user_post_count']
     
-    # Map back to all posts in thread
-    thread_source_features = source_posts[['thread_id', 'source_user_credibility', 'source_network_size']]
+    # Aggregate to one row per thread (handle multi-root threads by taking first source)
+    thread_source_features = source_posts.groupby('thread_id').agg(
+        source_user_credibility=('source_user_credibility', 'first'),
+        source_network_size=('source_network_size', 'first')
+    ).reset_index()
     
     df_features = df[['post_id', 'thread_id']].merge(
         thread_source_features,

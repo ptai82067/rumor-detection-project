@@ -1,0 +1,82 @@
+{
+  "experiment_metadata": {
+    "dataset_size": 102440,
+    "train_size": 81952,
+    "test_size": 20488,
+    "random_state": 42,
+    "bert_model": "all-MiniLM-L6-v2",
+    "bert_embedding_dim": 384,
+    "graph_features": 14,
+    "propagation_features": 4,
+    "classifier": "LogisticRegression",
+    "class_weight": "balanced"
+  },
+  "baseline": {
+    "Accuracy": 0.8064720812182741,
+    "Precision": 0.6545183579460778,
+    "Recall": 0.7734550112071726,
+    "F1-Score": 0.709033536361635,
+    "ROC-AUC": 0.8847242743711543,
+    "MCC": 0.5699821229887767
+  },
+  "best_graph_model": {
+    "Accuracy": 0.8092053885201094,
+    "Precision": 0.6584406779661017,
+    "Recall": 0.7774575728466219,
+    "F1-Score": 0.7130166654430659,
+    "ROC-AUC": 0.8857580999009707,
+    "MCC": 0.5760098272057592
+  },
+  "ablation_study": {
+    "exp_a_bert_only": {
+      "Accuracy": 0.6864994142912925,
+      "Precision": 0.48940246677044663,
+      "Recall": 0.654338776817163,
+      "F1-Score": 0.559978077687196,
+      "ROC-AUC": 0.7412933632952698,
+      "MCC": 0.3325214910043315
+    },
+    "exp_b_bert_prop": {
+      "Accuracy": 0.6875244045294807,
+      "Precision": 0.490678776290631,
+      "Recall": 0.6573807236631444,
+      "F1-Score": 0.5619269193923635,
+      "ROC-AUC": 0.7451841837110253,
+      "MCC": 0.33539684709581324
+    },
+    "exp_c_bert_graph": {
+      "Accuracy": 0.6921124560718469,
+      "Precision": 0.4962936394069823,
+      "Recall": 0.664585334614153,
+      "F1-Score": 0.5682409308692676,
+      "ROC-AUC": 0.7497015362687055,
+      "MCC": 0.34539198320404885
+    },
+    "exp_d_full_fusion": {
+      "Accuracy": 0.6929422100741898,
+      "Precision": 0.4973223848625491,
+      "Recall": 0.6690682036503363,
+      "F1-Score": 0.5705508908457915,
+      "ROC-AUC": 0.7528056602483137,
+      "MCC": 0.34861790046060354
+    }
+  },
+  "false_negative_analysis": {
+    "baseline_fn": 1415,
+    "best_graph_fn": 1390,
+    "bert_only_fn": 2159,
+    "bert_prop_fn": 2140,
+    "bert_graph_fn": 2095,
+    "full_fusion_fn": 2067,
+    "recovered_by_graph": 131,
+    "recovered_by_bert_graph": 552,
+    "recovered_by_full_fusion": 577,
+    "still_missed": 2067
+  },
+  "success_criteria": {
+    "target_recall": 0.7775,
+    "best_recall_achieved": 0.7774575728466219,
+    "best_model": "Best Graph (TF-IDF + Prop + Graph)",
+    "recall_improvement": 0.004002561639449231
+  }
+}

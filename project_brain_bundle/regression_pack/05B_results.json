@@ -1,0 +1,129 @@
+{
+  "experiment_metadata": {
+    "dataset": "data/processed/pheme_features_with_graph.csv",
+    "dataset_shape": [
+      102440,
+      32
+    ],
+    "train_size": 81952,
+    "test_size": 20488,
+    "random_state": 42,
+    "bert_model": "all-MiniLM-L6-v2",
+    "bert_embedding_dim": 384,
+    "graph_features": [
+      "node_in_degree",
+      "node_out_degree",
+      "pagerank_score",
+      "betweenness_centrality",
+      "closeness_centrality",
+      "user_prior_rumor_ratio",
+      "user_post_count",
+      "user_thread_count",
+      "user_avg_depth",
+      "subtree_reply_count",
+      "sibling_count",
+      "position_in_thread",
+      "source_user_credibility",
+      "source_network_size"
+    ],
+    "propagation_features": [
+      "is_reply",
+      "thread_size",
+      "children_count",
+      "depth"
+    ]
+  },
+  "systems": {
+    "A_TFIDF_baseline": {
+      "Accuracy": 0.8064720812182741,
+      "Precision": 0.6545183579460778,
+      "Recall": 0.7734550112071726,
+      "F1-Score": 0.709033536361635,
+      "F1 (Non-Rumor)": 0.8550221214669641,
+      "ROC-AUC": 0.8847242743711543,
+      "MCC": 0.5699821229887767
+    },
+    "B_MiniLM_only": {
+      "Accuracy": 0.6864994142912925,
+      "Precision": 0.48940246677044663,
+      "Recall": 0.654338776817163,
+      "F1-Score": 0.559978077687196,
+      "F1 (Non-Rumor)": 0.7565108609120892,
+      "ROC-AUC": 0.7412933632952698,
+      "MCC": 0.3325214910043315
+    },
+    "C_MiniLM_plus_graph": {
+      "Accuracy": 0.9590980085903944,
+      "Precision": 0.9118184587267743,
+      "Recall": 0.9585334614153058,
+      "F1-Score": 0.9345925694661255,
+      "F1 (Non-Rumor)": 0.9702457037352649,
+      "ROC-AUC": 0.9929256451414398,
+      "MCC": 0.9054629584237434
+    },
+    "D_Hybrid": {
+      "Accuracy": 0.962319406481843,
+      "Precision": 0.9193993257738278,
+      "Recall": 0.9606147934678194,
+      "F1-Score": 0.9395552771688067,
+      "F1 (Non-Rumor)": 0.972627996028932,
+      "ROC-AUC": 0.9940866634353894,
+      "MCC": 0.9126652300105695
+    }
+  },
+  "ablation_analysis": {
+    "graph_contribution_to_minilm": {
+      "Accuracy": 0.2726,
+      "Precision": 0.4224,
+      "Recall": 0.3042,
+      "F1-Score": 0.3746,
+      "ROC-AUC": 0.2516,
+      "MCC": 0.5729
+    },
+    "fn_reduction_B_to_C": 1900,
+    "fn_reduction_B_to_D": 1913,
+    "fn_reduction_A_to_D": 1169
+  },
+  "confusion_matrices": {
+    "A": [
+      [
+        11692,
+        2550
+      ],
+      [
+        1415,
+        4831
+      ]
+    ],
+    "B": [
+      [
+        9978,
+        4264
+      ],
+      [
+        2159,
+        4087
+      ]
+    ],
+    "C": [
+      [
+        13663,
+        579
+      ],
+      [
+        259,
+        5987
+      ]
+    ],
+    "D": [
+      [
+        13716,
+        526
+      ],
+      [
+        246,
+        6000
+      ]
+    ]
+  }
+}
