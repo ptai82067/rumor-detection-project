@@ -124,4 +124,11 @@ cython_debug/
 .idea/
 
 # VS Code
-.vscode/
+.vscode/# Large generated data files  
+data/processed/pheme_kg_v2.ttl  
+data/processed/pheme_kg.ttl  
+data/processed/minilm_embeddings*.npy  
+data/processed/pheme_clean.csv  
+data/processed/pheme_features.csv  
+data/processed/pheme_features_with_graph.csv  
+nul) 

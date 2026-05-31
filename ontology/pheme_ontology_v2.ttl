@@ -1,0 +1,372 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix ex: <http://example.org/pheme#> .
+@prefix schema: <http://schema.org/> .
+
+# =============================================================================
+# CLASSES
+# =============================================================================
+
+ex:Event a owl:Class ;
+    rdfs:label "Event" ;
+    rdfs:comment "A real-world event that generates social media discussion." .
+
+ex:Post a owl:Class ;
+    rdfs:label "Post" ;
+    rdfs:comment "A social media post (tweet) in the PHEME dataset." .
+
+ex:User a owl:Class ;
+    rdfs:label "User" ;
+    rdfs:comment "A social media user who creates posts." .
+
+ex:ConversationThread a owl:Class ;
+    rdfs:label "ConversationThread" ;
+    rdfs:comment "A thread of conversation consisting of a root post and its replies." .
+
+ex:VeracityLabel a owl:Class ;
+    rdfs:label "VeracityLabel" ;
+    rdfs:comment "Label indicating whether a conversation thread is a rumor (1) or non-rumor (0)." .
+
+# =============================================================================
+# SUBCLASSES (v2)
+# =============================================================================
+
+ex:SourcePost a owl:Class ;
+    rdfs:subClassOf ex:Post ;
+    rdfs:label "Source Post" ;
+    rdfs:comment "The root/original post that starts a conversation thread." .
+
+ex:ReplyPost a owl:Class ;
+    rdfs:subClassOf ex:Post ;
+    rdfs:label "Reply Post" ;
+    rdfs:comment "A post that replies to another post within a conversation thread." .
+
+# =============================================================================
+# OBJECT PROPERTIES
+# =============================================================================
+
+ex:postedBy a owl:ObjectProperty ;
+    rdfs:label "posted by" ;
+    rdfs:domain ex:Post ;
+    rdfs:range ex:User ;
+    rdfs:comment "Relates a post to the user who created it." .
+
+ex:aboutEvent a owl:ObjectProperty ;
+    rdfs:label "about event" ;
+    rdfs:domain ex:Post ;
+    rdfs:range ex:Event ;
+    rdfs:comment "Relates a post to the event it discusses." .
+
+ex:repliesTo a owl:ObjectProperty ;
+    rdfs:label "replies to" ;
+    rdfs:domain ex:Post ;
+    rdfs:range ex:Post ;
+    rdfs:comment "Relates a reply post to the post it replies to. Forms a tree structure." .
+
+ex:inThread a owl:ObjectProperty ;
+    rdfs:label "in thread" ;
+    rdfs:domain ex:Post ;
+    rdfs:range ex:ConversationThread ;
+    rdfs:comment "Relates a post to the conversation thread it belongs to." .
+
+ex:hasVeracity a owl:ObjectProperty ;
+    rdfs:label "has veracity" ;
+    rdfs:domain ex:ConversationThread ;
+    rdfs:range ex:VeracityLabel ;
+    rdfs:comment "Relates a conversation thread to its veracity label (rumor/non-rumor)." .
+
+# =============================================================================
+# OBJECT PROPERTIES (v2)
+# =============================================================================
+
+ex:hasSourcePost a owl:ObjectProperty ;
+    rdfs:label "has source post" ;
+    rdfs:domain ex:ConversationThread ;
+    rdfs:range ex:SourcePost ;
+    rdfs:comment "Relates a conversation thread to its root/source post." .
+
+ex:hasReply a owl:ObjectProperty ;
+    rdfs:label "has reply" ;
+    rdfs:domain ex:Post ;
+    rdfs:range ex:ReplyPost ;
+    rdfs:comment "Relates a post to its direct reply posts." .
+
+ex:hasParentPost a owl:ObjectProperty ;
+    rdfs:label "has parent post" ;
+    rdfs:domain ex:ReplyPost ;
+    rdfs:range ex:Post ;
+    rdfs:comment "Relates a reply post to the post it directly replies to." .
+
+ex:hasChildPost a owl:ObjectProperty ;
+    rdfs:label "has child post" ;
+    rdfs:domain ex:Post ;
+    rdfs:range ex:ReplyPost ;
+    rdfs:comment "Relates a post to its direct reply children." .
+
+ex:belongsToEvent a owl:ObjectProperty ;
+    rdfs:label "belongs to event" ;
+    rdfs:domain ex:ConversationThread ;
+    rdfs:range ex:Event ;
+    rdfs:comment "Relates a conversation thread to the real-world event it discusses." .
+
+ex:participatesInThread a owl:ObjectProperty ;
+    rdfs:label "participates in thread" ;
+    rdfs:domain ex:User ;
+    rdfs:range ex:ConversationThread ;
+    rdfs:comment "Relates a user to conversation threads they have posted in." .
+
+# =============================================================================
+# DATA PROPERTIES
+# =============================================================================
+
+# Post properties
+ex:text a owl:DatatypeProperty ;
+    rdfs:label "text" ;
+    rdfs:domain ex:Post ;
+    rdfs:range xsd:string ;
+    rdfs:comment "The text content of the post." .
+
+ex:createdAt a owl:DatatypeProperty ;
+    rdfs:label "created at" ;
+    rdfs:domain ex:Post ;
+    rdfs:range xsd:dateTime ;
+    rdfs:comment "The timestamp when the post was created." .
+
+ex:depth a owl:DatatypeProperty ;
+    rdfs:label "depth" ;
+    rdfs:domain ex:Post ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "The depth of the post in the conversation tree (0 for root posts)." .
+
+ex:childrenCount a owl:DatatypeProperty ;
+    rdfs:label "children count" ;
+    rdfs:domain ex:Post ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Number of direct replies to this post." .
+
+ex:timeSinceSource a owl:DatatypeProperty ;
+    rdfs:label "time since source" ;
+    rdfs:domain ex:Post ;
+    rdfs:range xsd:float ;
+    rdfs:comment "Time elapsed since the thread's source post was created (in seconds)." .
+
+# Thread properties
+ex:threadSize a owl:DatatypeProperty ;
+    rdfs:label "thread size" ;
+    rdfs:domain ex:ConversationThread ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Total number of posts in the conversation thread." .
+
+ex:maxDepth a owl:DatatypeProperty ;
+    rdfs:label "max depth" ;
+    rdfs:domain ex:ConversationThread ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Maximum depth reached in the conversation tree." .
+
+ex:replySpeed a owl:DatatypeProperty ;
+    rdfs:label "reply speed" ;
+    rdfs:domain ex:ConversationThread ;
+    rdfs:range xsd:float ;
+    rdfs:comment "Average reply rate in the thread (replies per hour)." .
+
+# =============================================================================
+# DATA PROPERTIES FOR Post (v2)
+# =============================================================================
+
+ex:postId a owl:DatatypeProperty ;
+    rdfs:label "post id" ;
+    rdfs:domain ex:Post ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Unique identifier of the post." .
+
+ex:isSourcePost a owl:DatatypeProperty ;
+    rdfs:label "is source post" ;
+    rdfs:domain ex:Post ;
+    rdfs:range xsd:boolean ;
+    rdfs:comment "True if this post is the root of a conversation thread." .
+
+ex:isReply a owl:DatatypeProperty ;
+    rdfs:label "is reply" ;
+    rdfs:domain ex:Post ;
+    rdfs:range xsd:boolean ;
+    rdfs:comment "True if this post is a reply to another post." .
+
+ex:textLength a owl:DatatypeProperty ;
+    rdfs:label "text length" ;
+    rdfs:domain ex:Post ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Number of characters in the post text." .
+
+ex:positionInThread a owl:DatatypeProperty ;
+    rdfs:label "position in thread" ;
+    rdfs:domain ex:Post ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Chronological position of this post within its thread (0-indexed)." .
+
+ex:subtreeReplyCount a owl:DatatypeProperty ;
+    rdfs:label "subtree reply count" ;
+    rdfs:domain ex:Post ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Total number of replies in the subtree rooted at this post." .
+
+ex:siblingCount a owl:DatatypeProperty ;
+    rdfs:label "sibling count" ;
+    rdfs:domain ex:Post ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Number of posts sharing the same parent post." .
+
+ex:pagerankScore a owl:DatatypeProperty ;
+    rdfs:label "pagerank score" ;
+    rdfs:domain ex:Post ;
+    rdfs:range xsd:float ;
+    rdfs:comment "PageRank centrality score of this post node in the reply graph." .
+
+ex:betweennessScore a owl:DatatypeProperty ;
+    rdfs:label "betweenness score" ;
+    rdfs:domain ex:Post ;
+    rdfs:range xsd:float ;
+    rdfs:comment "Betweenness centrality score of this post node in the reply graph." .
+
+ex:closenessScore a owl:DatatypeProperty ;
+    rdfs:label "closeness score" ;
+    rdfs:domain ex:Post ;
+    rdfs:range xsd:float ;
+    rdfs:comment "Closeness centrality score of this post node in the reply graph." .
+
+ex:nodeInDegree a owl:DatatypeProperty ;
+    rdfs:label "node in degree" ;
+    rdfs:domain ex:Post ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Number of incoming reply edges (how many posts reply to this post)." .
+
+ex:nodeOutDegree a owl:DatatypeProperty ;
+    rdfs:label "node out degree" ;
+    rdfs:domain ex:Post ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Number of outgoing reply edges (0 for source, 1 for reply posts)." .
+
+# =============================================================================
+# DATA PROPERTIES FOR User (v2)
+# =============================================================================
+
+ex:userId a owl:DatatypeProperty ;
+    rdfs:label "user id" ;
+    rdfs:domain ex:User ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Unique identifier of the user." .
+
+ex:userPostCount a owl:DatatypeProperty ;
+    rdfs:label "user post count" ;
+    rdfs:domain ex:User ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Total number of posts this user has made in the dataset." .
+
+ex:userThreadCount a owl:DatatypeProperty ;
+    rdfs:label "user thread count" ;
+    rdfs:domain ex:User ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Number of distinct conversation threads this user participated in." .
+
+ex:userAvgDepth a owl:DatatypeProperty ;
+    rdfs:label "user average depth" ;
+    rdfs:domain ex:User ;
+    rdfs:range xsd:float ;
+    rdfs:comment "Average depth of posts made by this user across all threads." .
+
+ex:userPriorRumorRatio a owl:DatatypeProperty ;
+    rdfs:label "user prior rumor ratio" ;
+    rdfs:domain ex:User ;
+    rdfs:range xsd:float ;
+    rdfs:comment "Ratio of rumor-labeled posts among all posts by this user (prior behavior)." .
+
+ex:sourceNetworkSize a owl:DatatypeProperty ;
+    rdfs:label "source network size" ;
+    rdfs:domain ex:User ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Total post count of the user who started the thread (as proxy for network size)." .
+
+ex:sourceUserCredibility a owl:DatatypeProperty ;
+    rdfs:label "source user credibility" ;
+    rdfs:domain ex:User ;
+    rdfs:range xsd:float ;
+    rdfs:comment "Credibility score of the source user, computed as 1 minus userPriorRumorRatio." .
+
+# =============================================================================
+# DATA PROPERTIES FOR Event (v2)
+# =============================================================================
+
+ex:eventId a owl:DatatypeProperty ;
+    rdfs:label "event id" ;
+    rdfs:domain ex:Event ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Unique identifier/slug of the event (e.g. charliehebdo)." .
+
+ex:eventName a owl:DatatypeProperty ;
+    rdfs:label "event name" ;
+    rdfs:domain ex:Event ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Human-readable name of the event." .
+
+ex:eventType a owl:DatatypeProperty ;
+    rdfs:label "event type" ;
+    rdfs:domain ex:Event ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Category of the event (e.g. terrorism, accident, politics)." .
+
+# =============================================================================
+# DATA PROPERTIES FOR ConversationThread (v2)
+# =============================================================================
+
+ex:threadId a owl:DatatypeProperty ;
+    rdfs:label "thread id" ;
+    rdfs:domain ex:ConversationThread ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Unique identifier of the conversation thread." .
+
+ex:rumorLabel a owl:DatatypeProperty ;
+    rdfs:label "rumor label" ;
+    rdfs:domain ex:ConversationThread ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Ground truth label: 1 for rumor, 0 for non-rumor." .
+
+# =============================================================================
+# CONSTRAINTS AND AXIOMS
+# =============================================================================
+
+# Each thread has exactly one veracity label
+ex:ConversationThread rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty ex:hasVeracity ;
+    owl:cardinality "1"^^xsd:nonNegativeInteger
+] .
+
+# Veracity labels are either 0 (non-rumor) or 1 (rumor)
+ex:VeracityLabel rdfs:subClassOf [
+    a owl:Class ;
+    owl:oneOf ( ex:NonRumor ex:Rumor )
+] .
+
+ex:NonRumor a ex:VeracityLabel ;
+    rdfs:label "Non-Rumor" ;
+    rdfs:comment "Label for non-rumor conversation threads." .
+
+ex:Rumor a ex:VeracityLabel ;
+    rdfs:label "Rumor" ;
+    rdfs:comment "Label for rumor conversation threads." .
+
+# =============================================================================
+# NAMESPACE DOCUMENTATION
+# =============================================================================
+
+# This ontology is designed for Version 2 of the PHEME rumor detection knowledge graph.
+# It extends Version 1 with additional subclasses, object properties, and data properties
+# for richer semantic representation of social media rumor dynamics.
+# 
+# URI Pattern:
+# - ex:post/{post_id}
+# - ex:user/{user_id}
+# - ex:event/{event_id}
+# - ex:thread/{thread_id}
+# - ex:label/{label_value}
