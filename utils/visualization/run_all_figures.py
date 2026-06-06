@@ -29,7 +29,7 @@ def get_file_size(path):
 
 def main():
     print("=" * 60)
-    print("  Visualization Runner — Sinh 4 hình cho báo cáo")
+    print("  Visualization Runner - Sinh 4 hinh cho bao cao")
     print("=" * 60)
     print()
 

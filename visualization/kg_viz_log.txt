@@ -1,0 +1,44 @@
+KG Semantic Final Visualization - Debug Log
+============================================================
+[2026-06-03 23:51:12] ============================================================
+[2026-06-03 23:51:12] Starting KG Semantic Final Visualization (final tuning)
+[2026-06-03 23:51:12] ============================================================
+[2026-06-03 23:51:12] Loading graph_features_v2.csv...
+[2026-06-03 23:51:12]   5802 threads
+[2026-06-03 23:51:12] Loading pheme_features_with_graph.csv...
+[2026-06-03 23:51:13]   102440 posts
+[2026-06-03 23:51:13] Selecting thread...
+[2026-06-03 23:51:13] Candidate filter 'ALL criteria': 459 threads
+[2026-06-03 23:51:13]   Selected thread_id=498254929942028288, criteria='ALL criteria'
+[2026-06-03 23:51:13] 
+[2026-06-03 23:51:13] === SELECTED THREAD ===
+[2026-06-03 23:51:13] thread_id: 498254929942028288
+[2026-06-03 23:51:13] criteria: ALL criteria
+[2026-06-03 23:51:13] num_nodes: 20
+[2026-06-03 23:51:13] thread_depth: 3
+[2026-06-03 23:51:13] source_reply_count: 13
+[2026-06-03 23:51:13] user_rumor_ratio: 0.783477
+[2026-06-03 23:51:13] source_pagerank: 0.04127918
+[2026-06-03 23:51:13] avg_depth: 0.950000
+[2026-06-03 23:51:13] unique_users: 17
+[2026-06-03 23:51:13] 
+[2026-06-03 23:51:13] === SAMPLE POSTS (first 5) ===
+[2026-06-03 23:51:13]   post_id=498254929942028288 reply_to=NaN depth=0 is_source=True user_id=7214972
+[2026-06-03 23:51:13]   post_id=498263651045081089 reply_to=498258298358231040 depth=0 is_source=False user_id=32921077
+[2026-06-03 23:51:13]   post_id=498494489133330432 reply_to=498494090661490688 depth=0 is_source=False user_id=7214972
+[2026-06-03 23:51:13]   post_id=498884029094305793 reply_to=498258298358231040 depth=0 is_source=False user_id=329159493
+[2026-06-03 23:51:13]   post_id=498258298358231041 reply_to=498254929942028288 depth=1 is_source=False user_id=712590698
+[2026-06-03 23:51:13] 
+[2026-06-03 23:51:13] Building ontology graph...
+[2026-06-03 23:51:13]   Nodes: 11, Edges: 20
+[2026-06-03 23:51:13]   All 7 ontology v2 relations present [OK]
+[2026-06-03 23:51:13] 
+[2026-06-03 23:51:13] Drawing figure...
+[2026-06-03 23:51:13] Exporting PNG...
+[2026-06-03 23:51:13]   PNG: visualization\kg_semantic_final.png (424,166 bytes)
+[2026-06-03 23:51:13] Exporting SVG...
+[2026-06-03 23:51:13]   SVG: visualization\kg_semantic_final.svg (173,070 bytes)
+[2026-06-03 23:51:13] 
+[2026-06-03 23:51:13] ============================================================
+[2026-06-03 23:51:13] COMPLETE
+[2026-06-03 23:51:13] ============================================================

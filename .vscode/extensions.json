@@ -1,0 +1,41 @@
+{
+  "recommendations": [
+    // ─── Python Core ───
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "ms-python.debugpy",
+
+    // ─── Jupyter Notebook ───
+    "ms-toolsai.jupyter",
+    "ms-toolsai.vscode-jupyter-cell-tags",
+    "ms-toolsai.vscode-jupyter-notebook-renderers",
+
+    // ─── Linting & Formatting ───
+    "ms-python.flake8",
+    "ms-python.black-formatter",
+    "ms-python.isort",
+
+    // ─── Data Science ───
+    "mechatroner.rainbow-csv",
+
+    // ─── Knowledge Graph / RDF / OWL ───
+    "zazuko.rdf-vscode",
+    "stardog-union.vscode-sparql-notebook",
+
+    // ─── Visualization ───
+    "bierner.markdown-mermaid",
+    "joaompinto.graphviz-preview",
+
+    // ─── Markdown ───
+    "yzhang.markdown-all-in-one",
+
+    // ─── Git ───
+    "eamodio.gitlens",
+    "mhutchie.git-graph",
+
+    // ─── Utility ───
+    "christian-kohler.path-intellisense",
+    "Gruntfuggly.todo-tree",
+    "oderwat.indent-rainbow"
+  ]
+}
