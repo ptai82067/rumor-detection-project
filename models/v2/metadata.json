@@ -1,0 +1,104 @@
+{
+  "pipeline": "V2 -- Thread-Level (Ablation Pipeline)",
+  "training_script": "scripts/train_and_save_v2.py",
+  "based_on": "run_ablation.py",
+  "dataset": {
+    "base_features": "data/processed/pheme_features.csv",
+    "graph_features_v2": "data/processed/graph_features_v2.csv"
+  },
+  "dataset_shape": {
+    "posts": [
+      102440,
+      17
+    ],
+    "threads": [
+      5802,
+      22
+    ]
+  },
+  "train_test_split": {
+    "test_size": 0.2,
+    "random_state": 42,
+    "stratified": true,
+    "train_size": 4641,
+    "test_size_count": 1161
+  },
+  "classifier": "LogisticRegression",
+  "classifier_params": {
+    "C": 1.0,
+    "max_iter": 1000,
+    "random_state": 42,
+    "class_weight": null
+  },
+  "features": {
+    "minilm": {
+      "model": "all-MiniLM-L6-v2",
+      "dimension": 384,
+      "level": "thread-level (source text only)"
+    },
+    "propagation": {
+      "columns": [
+        "thread_size",
+        "max_depth",
+        "avg_depth_prop",
+        "reply_rate"
+      ],
+      "count": 4
+    },
+    "graph": {
+      "columns": [
+        "thread_depth",
+        "num_nodes",
+        "num_edges",
+        "avg_branching_factor",
+        "max_branching_factor",
+        "source_reply_count",
+        "leaf_ratio",
+        "avg_depth",
+        "source_pagerank",
+        "avg_pagerank",
+        "source_centrality",
+        "avg_centrality",
+        "user_rumor_ratio",
+        "unique_users"
+      ],
+      "count": 14
+    }
+  },
+  "feature_dimensions": {
+    "minilm": 384,
+    "propagation": 4,
+    "graph": 14,
+    "total_full_hybrid": 402
+  },
+  "metrics": {
+    "model": "Full Hybrid (MiniLM + Propagation + Graph)",
+    "accuracy": 0.9811,
+    "precision": 0.9794,
+    "recall": 0.9646,
+    "f1_score": 0.9719,
+    "false_negatives": 14,
+    "confusion_matrix": [
+      [
+        758,
+        8
+      ],
+      [
+        14,
+        381
+      ]
+    ]
+  },
+  "ablation_reference": {
+    "script": "run_ablation.py",
+    "expected_accuracy": 0.9811,
+    "expected_recall": 0.9646,
+    "expected_f1": 0.9719
+  },
+  "artifacts": [
+    "model.joblib -- Trained LogisticRegression (Full Hybrid)",
+    "scaler.joblib -- StandardScaler for combined features (384+4+14=402)",
+    "metadata.json -- This configuration file"
+  ],
+  "generation_date": "2026-06-07"
+}

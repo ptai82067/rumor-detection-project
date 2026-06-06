@@ -36,3 +36,7 @@ jupyter>=1.0.0
 ipykernel>=6.0.0
 black>=21.0.0
 flake8>=4.0.0
+
+# UI Application (Thesis Demo)
+streamlit>=1.28.0
+pyvis>=0.3.1
