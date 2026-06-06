@@ -15,7 +15,7 @@ textblob>=0.15.0
 
 # Graph and Network Analysis
 networkx>=2.6
-pygraphviz>=0.9
+
 
 # Knowledge Graph and Ontology
 rdflib>=6.0.0
