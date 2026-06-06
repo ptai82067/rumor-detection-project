@@ -130,4 +130,4 @@ else:
     st.info("Chạy Pipeline huấn luyện để tạo final_metrics_table.csv")
 
 st.markdown("---")
-st.caption("Rumor Detection Thesis — Trường Đại học Bách khoa TP.HCM (HCMUT)")
+st.caption("Rumor Detection Thesis — Trường Đại học Nha Trang (NTU)")
