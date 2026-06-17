@@ -47,10 +47,9 @@ col1, col2, col3 = st.columns(3)
 
 with col1:
     st.info("### Giai đoạn 1: Baseline\n\n"
-            "**TF-IDF + Propagation Features**\n\n"
+            "**TF-IDF**\n\n"
             "- Logistic Regression\n"
             "- 5,000 TF-IDF Features\n"
-            "- 4 Propagation Features\n"
             "- Recall: ~61%")
 
 with col2:
