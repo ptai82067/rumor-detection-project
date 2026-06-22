@@ -9,7 +9,7 @@ import pandas as pd
 import numpy as np
 
 
-def create_metrics_bar_chart(df, title="Model Performance Comparison"):
+def create_metrics_bar_chart(df, title="Сравнение производительности моделей"):
     """Create grouped bar chart of Accuracy, Precision, Recall, F1 for all models."""
     metrics = ['Accuracy', 'Precision', 'Recall', 'F1']
     models = df['Model'].tolist() if 'Model' in df.columns else df.index.tolist()
@@ -31,8 +31,8 @@ def create_metrics_bar_chart(df, title="Model Performance Comparison"):
     
     fig.update_layout(
         title=title,
-        xaxis_title="Model",
-        yaxis_title="Score",
+        xaxis_title="Модель",
+        yaxis_title="Оценка",
         yaxis_range=[0, 1.05],
         barmode='group',
         bargap=0.15,
@@ -72,7 +72,7 @@ def create_recall_fn_chart(df):
     
     fig.update_layout(
         title="Recall vs False Negatives",
-        xaxis_title="Model",
+        xaxis_title="Модель",
         yaxis=dict(title="Recall", color='red', range=[0.5, 1.0]),
         yaxis2=dict(title="False Negatives", overlaying='y', side='right'),
         template='plotly_white',
@@ -109,8 +109,8 @@ def create_feature_dimension_chart():
     ))
     
     fig.update_layout(
-        title="Feature Dimension Comparison",
-        xaxis_title="Dimension Count",
+        title="Сравнение размерностей признаков",
+        xaxis_title="Количество измерений",
         barmode='group',
         template='plotly_white',
         height=350,
@@ -121,18 +121,18 @@ def create_feature_dimension_chart():
 
 def create_pie_chart(prediction, confidence):
     """Create a pie chart for prediction confidence."""
-    label = "Rumor" if prediction == 1 else "Non-Rumor"
+    label = "Слух" if prediction == 1 else "Не слух"
     other_prob = 1.0 - confidence
     
     fig = go.Figure(data=[go.Pie(
-        labels=[label, 'Other'],
+        labels=[label, 'Другое'],
         values=[confidence, other_prob],
-        marker_colors=['#C73E1D' if label == 'Rumor' else '#2E86AB', '#E0E0E0'],
+        marker_colors=['#C73E1D' if label == 'Слух' else '#2E86AB', '#E0E0E0'],
         textinfo='label+percent',
         hole=0.4
     )])
     fig.update_layout(
-        title=f"Prediction: {label}",
+        title=f"Предсказание: {label}",
         height=300,
         template='plotly_white',
         showlegend=False
@@ -140,7 +140,7 @@ def create_pie_chart(prediction, confidence):
     return fig
 
 
-def create_confusion_matrix(cm, labels=['Non-Rumor', 'Rumor']):
+def create_confusion_matrix(cm, labels=['Не слух', 'Слух']):
     """Create confusion matrix heatmap."""
     cm_norm = cm.astype('float') / cm.sum(axis=1, keepdims=True)
     
@@ -165,9 +165,9 @@ def create_confusion_matrix(cm, labels=['Non-Rumor', 'Rumor']):
         zmax=1
     ))
     fig.update_layout(
-        title="Confusion Matrix",
-        xaxis_title="Predicted",
-        yaxis_title="Actual",
+        title="Матрица ошибок",
+        xaxis_title="Предсказано",
+        yaxis_title="Фактически",
         xaxis=dict(side='bottom'),
         height=350,
         template='plotly_white',

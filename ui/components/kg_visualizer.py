@@ -17,7 +17,7 @@ def display_static_kg_viz():
     svg_path = os.path.join(PROJECT_ROOT, "visualization", "kg_semantic_final.svg")
     
     if os.path.exists(png_path):
-        st.image(png_path, caption="Knowledge Graph Visualization (Semantic Final)", use_container_width=True)
+        st.image(png_path, caption="Визуализация Графа знаний (Semantic Final)", use_container_width=True)
         return True
     return False
 
@@ -26,10 +26,10 @@ def display_ablation_figures():
     """Display pre-generated ablation study figures."""
     fig_dir = os.path.join(PROJECT_ROOT, "results", "ablation", "figures")
     figures = [
-        ("fig1_ablation_bar_metrics.png", "Ablation Study — Performance Metrics Comparison"),
-        ("fig2_recall_fn_trend.png", "Recall and False Negative Trend"),
-        ("fig3_confusion_matrices.png", "Confusion Matrices Across Configurations"),
-        ("fig4_feature_contribution.png", "Feature Contribution Analysis"),
+        ("fig1_ablation_bar_metrics.png", "Ablation Study — Сравнение метрик производительности"),
+        ("fig2_recall_fn_trend.png", "Тренд Recall и False Negative"),
+        ("fig3_confusion_matrices.png", "Матрицы ошибок по конфигурациям"),
+        ("fig4_feature_contribution.png", "Анализ вклада признаков"),
     ]
     
     shown = False
@@ -48,8 +48,8 @@ def display_ontology_diagram(version=1):
     if os.path.exists(md_path):
         with open(md_path, 'r', encoding='utf-8') as f:
             content = f.read()
-        st.markdown("### Mermaid Diagram")
+        st.markdown("### Диаграмма Mermaid")
         st.code(content, language="mermaid")
-        st.caption(f"Ontology V{version} — Mermaid Diagram")
+        st.caption(f"Ontology V{version} — Диаграмма Mermaid")
         return True
     return False

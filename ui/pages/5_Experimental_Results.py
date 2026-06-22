@@ -19,13 +19,13 @@ from ui.components.metrics_charts import (
 )
 from ui.components.kg_visualizer import display_ablation_figures
 
-st.title("📈 Kết quả thực nghiệm")
+st.title("📈 Результаты экспериментов")
 st.markdown("---")
 
 # ============================================================
 # FINAL METRICS
 # ============================================================
-st.subheader("Chỉ số hiệu năng cuối cùng")
+st.subheader("Итоговые показатели производительности")
 
 metrics_df = load_final_metrics()
 
@@ -43,12 +43,12 @@ if metrics_df is not None:
 
     with col2:
         st.info("""
-        **5 cấu hình mô hình**:
+        **5 конфигураций модели**:
         1. **TF-IDF + Propagation** — Baseline
-        2. **TF-IDF + Graph** — Tăng cường Graph
-        3. **MiniLM only** — Chỉ ngữ nghĩa
-        4. **MiniLM + Graph** — Ngữ nghĩa + Graph
-        5. **Full Hybrid** — Tốt nhất
+        2. **TF-IDF + Graph** — С графом
+        3. **MiniLM only** — Только семантика
+        4. **MiniLM + Graph** — Семантика + Граф
+        5. **Full Hybrid** — Лучшая
         """)
 
     # Interactive charts
@@ -56,14 +56,14 @@ if metrics_df is not None:
     st.plotly_chart(create_recall_fn_chart(metrics_df), use_container_width=True)
 
 else:
-    st.warning("Không tìm thấy final_metrics_table.csv. Chạy Notebook tổng hợp kết quả trước.")
+    st.warning("final_metrics_table.csv не найден. Сначала запустите ноутбук для агрегации результатов.")
 
 st.markdown("---")
 
 # ============================================================
 # ABLATION STUDY
 # ============================================================
-st.subheader("Kết quả Ablation Study")
+st.subheader("Результаты Ablation Study")
 
 ablation_df = load_ablation_table()
 
@@ -78,22 +78,22 @@ if ablation_df is not None:
     st.dataframe(display_df, use_container_width=True, hide_index=True)
 
     st.markdown("""
-    **Nhận xét**:
-    - MiniLM riêng lẻ kém hơn TF-IDF (73.5% so với 74.7% F1)
-    - Thêm Propagation vào MiniLM cải thiện không đáng kể (+0.1%)
-    - Thêm Graph vào MiniLM cải thiện **đáng kể** (+29.2% Recall)
-    - Full Hybrid (MiniLM + Prop + Graph) đạt kết quả tốt nhất
-    - False Negatives giảm từ 154 (TF-IDF) xuống 14 (Full Hybrid)
+    **Наблюдения**:
+    - MiniLM отдельно уступает TF-IDF (73.5% против 74.7% F1)
+    - Добавление Propagation к MiniLM улучшает незначительно (+0.1%)
+    - Добавление Graph к MiniLM улучшает **значительно** (+29.2% Recall)
+    - Full Hybrid (MiniLM + Prop + Graph) показывает лучший результат
+    - False Negatives снизились с 154 (TF-IDF) до 14 (Full Hybrid)
     """)
 else:
-    st.warning("Không tìm thấy Ablation Table. Chạy run_ablation.py trước.")
+    st.warning("Таблица Ablation не найдена. Сначала запустите run_ablation.py.")
 
 st.markdown("---")
 
 # ============================================================
 # CONFUSION MATRICES
 # ============================================================
-st.subheader("So sánh Confusion Matrix")
+st.subheader("Сравнение матриц ошибок")
 
 cm_data = {
     "TF-IDF + Propagation": np.array([[11692, 2550], [1415, 4831]]),
@@ -114,22 +114,22 @@ st.markdown("---")
 # ============================================================
 # PRE-GENERATED FIGURES
 # ============================================================
-st.subheader("Biểu đồ Ablation Study (đã tạo sẵn)")
+st.subheader("Графики Ablation Study (предварительно созданные)")
 
 if display_ablation_figures():
-    st.caption("Biểu đồ được tạo bởi run_ablation.py")
+    st.caption("Графики созданы с помощью run_ablation.py")
 else:
-    st.info("Chạy run_ablation.py để tạo biểu đồ Ablation.")
+    st.info("Запустите run_ablation.py для создания графиков Ablation.")
 
 st.markdown("---")
 
 # Key findings
-st.subheader("🔑 Tổng kết các kết quả chính")
+st.subheader("🔑 Итоги основных результатов")
 
 col1, col2, col3 = st.columns(3)
 with col1:
-    st.success("**Kết quả 1**\n\nGraph Topology Features cải thiện **+30.4% Recall** khi thêm vào MiniLM Embeddings, khôi phục 1,900 False Negatives.")
+    st.success("**Результат 1**\n\nТопологические признаки графа улучшают **+30.4% Recall** при добавлении к MiniLM Embeddings, восстанавливая 1,900 False Negatives.")
 with col2:
-    st.success("**Kết quả 2**\n\nFull Hybrid Model đạt **96.2% Accuracy** và **96.1% Recall** — tốt nhất trong tất cả cấu hình.")
+    st.success("**Результат 2**\n\nПолная гибридная модель достигает **96.2% Accuracy** и **96.1% Recall** — лучший показатель среди всех конфигураций.")
 with col3:
-    st.success("**Kết quả 3**\n\nTổng hợp cấp Thread (V2, 402 chiều) vượt trội hơn cấp Post (V1, 5,398 chiều) dù chỉ dùng ~13x ít đặc trưng hơn, chứng minh giá trị của ngữ cảnh cấu trúc.")
+    st.success("**Результат 3**\n\nАгрегация на уровне Thread (V2, 402 измерения) превосходит Post-level (V1, 5,398 измерений), используя ~13x меньше признаков, что доказывает ценность структурного контекста.")

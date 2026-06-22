@@ -14,34 +14,34 @@ sys.path.insert(0, PROJECT_ROOT)
 
 from ui.components.metrics_charts import create_feature_dimension_chart
 
-st.title("📊 Phân tích đặc trưng")
+st.title("📊 Анализ признаков")
 st.markdown("---")
 
 # Feature Dimension Overview
-st.subheader("So sánh Feature Dimensions")
+st.subheader("Сравнение размерностей признаков")
 
 col1, col2 = st.columns(2)
 
 with col1:
-    st.info("### V1 — Post-Level (5,398 chiều)")
+    st.info("### V1 — Post-Level (5,398 измерений)")
     st.markdown("""
-    | Thành phần | Số chiều | Nguồn |
+    | Компонент | Размерность | Источник |
     |-----------|-----------|--------|
     | TF-IDF | **5,000** | `TfidfVectorizer(max_features=5000, ngram_range=(1,2))` |
     | MiniLM | **384** | `sentence-transformers/all-MiniLM-L6-v2` |
     | Graph | **14** | Post-level: Centrality, Reputation, Thread Structure, Authority |
-    | **Tổng** | **5,398** | `[TF-IDF + MiniLM + Graph]` |
+    | **Всего** | **5,398** | `[TF-IDF + MiniLM + Graph]` |
     """)
 
 with col2:
-    st.success("### V2 — Thread-Level (402 chiều)")
+    st.success("### V2 — Thread-Level (402 измерения)")
     st.markdown("""
-    | Thành phần | Số chiều | Nguồn |
+    | Компонент | Размерность | Источник |
     |-----------|-----------|--------|
-    | MiniLM | **384** | `sentence-transformers/all-MiniLM-L6-v2` (văn bản nguồn) |
+    | MiniLM | **384** | `sentence-transformers/all-MiniLM-L6-v2` (исходный текст) |
     | Propagation | **4** | `thread_size, max_depth, avg_depth, reply_rate` |
     | Graph | **14** | Thread-level: Topology, PageRank, Centrality, User Ratio |
-    | **Tổng** | **402** | `[MiniLM + Propagation + Graph]` |
+    | **Всего** | **402** | `[MiniLM + Propagation + Graph]` |
     """)
 
 # Feature dimension chart
@@ -50,19 +50,19 @@ st.plotly_chart(create_feature_dimension_chart(), use_container_width=True)
 st.markdown("---")
 
 # V2 Feature Groups
-st.subheader("Nhóm đặc trưng V2 — Phân tích chi tiết")
+st.subheader("Группы признаков V2 — Детальный анализ")
 
 v2_tab1, v2_tab2, v2_tab3 = st.tabs(["📐 Graph Topology", "📈 Propagation", "🧠 MiniLM"])
 
 with v2_tab1:
     st.markdown("### 14 Thread-Level Graph Features")
     st.markdown("""
-    Các đặc trưng này được trích xuất từ Knowledge Graph Reply Trees và thể hiện
-    các tính chất cấu trúc của các cuộc hội thoại.
+    Эти признаки извлекаются из деревьев ответов Графа знаний и отражают
+    структурные свойства диалогов.
     """)
 
     graph_features_data = {
-        'Đặc trưng': [
+        'Признак': [
             'thread_depth', 'num_nodes', 'num_edges',
             'avg_branching_factor', 'max_branching_factor',
             'source_reply_count', 'leaf_ratio', 'avg_depth',
@@ -70,7 +70,7 @@ with v2_tab1:
             'source_centrality', 'avg_centrality',
             'user_rumor_ratio', 'unique_users'
         ],
-        'Nhóm': [
+        'Группа': [
             'Topology', 'Topology', 'Topology',
             'Topology', 'Topology',
             'Topology', 'Topology', 'Topology',
@@ -78,21 +78,21 @@ with v2_tab1:
             'Centrality', 'Centrality',
             'User', 'User'
         ],
-        'Mô tả': [
-            'Độ sâu tối đa của Thread',
-            'Tổng số bài đăng trong Thread',
-            'Tổng số mối quan hệ trả lời',
-            'Số trả lời trung bình mỗi node',
-            'Số trả lời tối đa cho một bài đăng',
-            'Số trả lời trực tiếp cho Source Post',
-            'Tỷ lệ bài đăng không có trả lời (leaf)',
-            'Độ sâu trung bình các bài đăng',
-            'PageRank của Source Post',
-            'PageRank trung bình trong Thread',
-            'Degree Centrality của Source Post',
-            'Degree Centrality trung bình trong Thread',
-            'Tỷ lệ đăng tin đồn lịch sử của người dùng',
-            'Số người dùng duy nhất trong Thread'
+        'Описание': [
+            'Максимальная глубина Thread',
+            'Общее количество сообщений в Thread',
+            'Общее количество отношений ответов',
+            'Среднее количество ответов на узел',
+            'Максимальное количество ответов на одно сообщение',
+            'Количество прямых ответов на исходное сообщение',
+            'Доля сообщений без ответов (листовых)',
+            'Средняя глубина сообщений',
+            'PageRank исходного сообщения',
+            'Средний PageRank в Thread',
+            'Degree Centrality исходного сообщения',
+            'Средняя Degree Centrality в Thread',
+            'Доля слухов в истории пользователя',
+            'Количество уникальных пользователей в Thread'
         ]
     }
     gf_df = pd.DataFrame(graph_features_data)
@@ -101,50 +101,50 @@ with v2_tab1:
 with v2_tab2:
     st.markdown("### 4 Propagation Features")
     st.markdown("""
-    Propagation Features thể hiện cách thông tin lan truyền qua cấu trúc Thread,
-    bao gồm kích thước, độ sâu và tốc độ phản hồi.
+    Propagation Features отражают то, как информация распространяется через структуру Thread,
+    включая размер, глубину и скорость отклика.
     """)
 
     prop_features_data = {
-        'Đặc trưng': ['thread_size', 'max_depth', 'avg_depth', 'reply_rate'],
-        'Mô tả': [
-            'Tổng số bài đăng trong Thread',
-            'Độ sâu tối đa của cây trả lời',
-            'Độ sâu trung bình của tất cả bài đăng',
-            'Tổng bài đăng / (thread_size + 1) — mật độ trả lời chuẩn hóa'
+        'Признак': ['thread_size', 'max_depth', 'avg_depth', 'reply_rate'],
+        'Описание': [
+            'Общее количество сообщений в Thread',
+            'Максимальная глубина дерева ответов',
+            'Средняя глубина всех сообщений',
+            'Всего сообщений / (thread_size + 1) — нормированная плотность ответов'
         ]
     }
     pf_df = pd.DataFrame(prop_features_data)
     st.dataframe(pf_df, use_container_width=True, hide_index=True)
 
 with v2_tab3:
-    st.markdown("### MiniLM Sentence Embeddings")
+    st.markdown("### MiniML Sentence Embeddings")
     st.markdown("""
-    **Model**: `all-MiniLM-L6-v2` từ SentenceTransformers
+    **Модель**: `all-MiniLM-L6-v2` от SentenceTransformers
 
-    | Thuộc tính | Giá trị |
+    | Свойство | Значение |
     |----------|-------|
-    | Số chiều | 384 |
-    | Nguồn | V2: văn bản nguồn (bài đăng đầu tiên); V1: toàn bộ văn bản |
-    | Dung lượng model | ~80 MB |
-    | Loại | Pooled Sentence Embeddings (Mean Pooling) |
-    | Dữ liệu huấn luyện | 1B+ cặp câu (học tương phản) |
+    | Размерность | 384 |
+    | Источник | V2: исходный текст (первое сообщение); V1: весь текст |
+    | Размер модели | ~80 MB |
+    | Тип | Pooled Sentence Embeddings (Mean Pooling) |
+    | Обучающие данные | 1B+ пар предложений (контрастивное обучение) |
 
-    MiniLM là phiên bản distilled của BERT được tối ưu hóa cho tương đồng ngữ nghĩa cấp câu.
-    Nó tạo ra Embedding có kích thước cố định thể hiện ý nghĩa ngữ nghĩa của văn bản.
+    MiniLM — это дистиллированная версия BERT, оптимизированная для семантического сходства на уровне предложений.
+    Она создаёт эмбеддинги фиксированного размера, отражающие семантическое значение текста.
     """)
 
 st.markdown("---")
 
 # V1 Feature Groups
-st.subheader("Nhóm đặc trưng V1 — Phân tích chi tiết")
+st.subheader("Группы признаков V1 — Детальный анализ")
 
 v1_tab1, v1_tab2, v1_tab3 = st.tabs(["📝 TF-IDF", "🧠 MiniLM", "🕸️ Graph"])
 
 with v1_tab1:
-    st.markdown("### TF-IDF Features (5,000 chiều)")
+    st.markdown("### TF-IDF Features (5,000 измерений)")
     st.markdown("""
-    | Tham số | Giá trị |
+    | Параметр | Значение |
     |-----------|-------|
     | max_features | 5,000 |
     | ngram_range | (1, 2) |
@@ -152,39 +152,39 @@ with v1_tab1:
     | min_df | 2 |
     | max_df | 0.95 |
 
-    TF-IDF ghi nhận các mẫu từ vựng: unigrams và bigrams được gán trọng số
-    dựa trên tần số nghịch đảo tài liệu trong toàn bộ kho ngữ liệu.
+    TF-IDF фиксирует лексические шаблоны: униграммы и биграммы, взвешенные
+    по обратной частоте документа во всём корпусе.
     """)
 
 with v1_tab2:
-    st.markdown("### MiniLM Sentence Embeddings (384 chiều)")
+    st.markdown("### MiniLM Sentence Embeddings (384 измерения)")
     st.markdown("""
-    Cùng kiến trúc với V2, nhưng được áp dụng trên **toàn bộ văn bản bài đăng**
-    thay vì chỉ văn bản nguồn.
+    Та же архитектура, что и в V2, но применяется ко **всему тексту сообщения**,
+    а не только к исходному тексту.
     """)
 
 with v1_tab3:
     st.markdown("### 14 Post-Level Graph Features")
     st.markdown("""
-    Khác với tổng hợp cấp Thread của V2, Graph Features của V1 được tính cho từng bài đăng:
+    В отличие от агрегации на уровне Thread в V2, Graph Features в V1 вычисляются для каждого сообщения:
 
-    | Nhóm đặc trưng | Các Feature |
+    | Группа признаков | Признаки |
     |--------------|----------|
-    | **Node Centrality** | `node_in_degree`, `node_out_degree`, `pagerank_score`, `betweenness_centrality`, `closeness_centrality` |
-    | **User Reputation** | `user_prior_rumor_ratio`, `user_post_count`, `user_thread_count`, `user_avg_depth` |
-    | **Thread Structure** | `subtree_reply_count`, `sibling_count`, `position_in_thread` |
-    | **Source Authority** | `source_user_credibility`, `source_network_size` |
+    | **Центральность узла** | `node_in_degree`, `node_out_degree`, `pagerank_score`, `betweenness_centrality`, `closeness_centrality` |
+    | **Репутация пользователя** | `user_prior_rumor_ratio`, `user_post_count`, `user_thread_count`, `user_avg_depth` |
+    | **Структура Thread** | `subtree_reply_count`, `sibling_count`, `position_in_thread` |
+    | **Авторитет источника** | `source_user_credibility`, `source_network_size` |
 
-    **Nguồn**: `utils/graph_features.py` — được tính qua `extract_all_graph_features()`
-    từ Reply Graph (NetworkX DiGraph) xây dựng từ Knowledge Graph.
+    **Источник**: `utils/graph_features.py` — вычисляется через `extract_all_graph_features()`
+    из графа ответов (NetworkX DiGraph), построенного на основе Графа знаний.
     """)
 
 st.markdown("---")
 
 # Key Insight
 st.info("""
-**Kết luận chính**: V2 đạt hiệu năng cao hơn (98.11%) với chỉ 402 đặc trưng
-nhờ hoạt động ở cấp Thread, trong khi V1 (96.23%) sử dụng 5,398 đặc trưng ở cấp Post.
-Việc tổng hợp cấp Thread cung cấp tín hiệu mạnh hơn bằng cách hợp nhất
-ngữ cảnh cuộc hội thoại vào một vector đặc trưng duy nhất.
+**Ключевой вывод**: V2 достигает более высокой производительности (98.11%) всего с 402 признаками
+благодаря работе на уровне Thread, в то время как V1 (96.23%) использует 5,398 признаков на уровне Post.
+Агрегация на уровне Thread обеспечивает более сильный сигнал путём объединения
+контекста диалога в единый вектор признаков.
 """)

@@ -15,99 +15,99 @@ from ui.components.data_loader import (
     load_dataset_statistics, load_final_metrics, load_v1_metadata, load_v2_metadata
 )
 
-st.title("🔬 Quá trình phát triển nghiên cứu")
+st.title("🔬 Ход исследования")
 st.markdown("---")
 
 # Project Overview
 col1, col2 = st.columns([2, 1])
 with col1:
     st.markdown("""
-    ## Rumor Detection on Social Media sử dụng Ontology và Knowledge Graph
+    ## Обнаружение слухов в соцсетях с использованием Онтологии и Графа знаний
     
-    Nghiên cứu này khảo sát việc tích hợp **Knowledge Graph Features**
-    với **Semantic Embeddings** để cải thiện phát hiện tin đồn trên mạng xã hội.
+    В этом исследовании рассматривается интеграция **признаков Графа знаний**
+    с **семантическими эмбеддингами** для улучшения обнаружения слухов в социальных сетях.
     
-    **Đóng góp chính**: Kết hợp Graph Features cấu trúc (Centrality, User Reputation,
-    Thread Topology) với MiniLM Embeddings để phân loại Hybrid.
+    **Основной вклад**: Комбинация структурных признаков графа (Centrality, User Reputation,
+    Thread Topology) с MiniLM эмбеддингами для гибридной классификации.
     """)
 
 with col2:
     stats = load_dataset_statistics()
     if stats:
-        st.metric("Kích thước dữ liệu", f"{stats.get('Number of Tweets', 'N/A')}")
-        st.metric("Số cuộc hội thoại", f"{stats.get('Number of Conversation Threads', 'N/A')}")
-        st.metric("Người dùng", f"{stats.get('Number of Users', 'N/A')}")
+        st.metric("Объём данных", f"{stats.get('Number of Tweets', 'N/A')}")
+        st.metric("Диалогов", f"{stats.get('Number of Conversation Threads', 'N/A')}")
+        st.metric("Пользователей", f"{stats.get('Number of Users', 'N/A')}")
 
 st.markdown("---")
 
 # Evolution Timeline
-st.subheader("📊 Lộ trình phát triển nghiên cứu")
+st.subheader("📊 Дорожная карта исследования")
 
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    st.info("### Giai đoạn 1: Baseline\n\n"
+    st.info("### Этап 1: Baseline\n\n"
             "**TF-IDF**\n\n"
             "- Logistic Regression\n"
-            "- 5,000 TF-IDF Features\n"
+            "- 5,000 TF-IDF признаков\n"
             "- Recall: ~61%")
 
 with col2:
-    st.warning("### Giai đoạn 2: Tích hợp Graph\n\n"
-               "**KG Feature Extraction**\n\n"
+    st.warning("### Этап 2: Интеграция графа\n\n"
+               "**Извлечение признаков KG**\n\n"
                "- PHEME Ontology V1/V2\n"
-               "- Xây dựng Reply Graph\n"
-               "- 14 Graph Topology Features\n"
-               "- Cải thiện Recall: +30.4%")
+               "- Построение графа ответов\n"
+               "- 14 топологических признаков графа\n"
+               "- Улучшение Recall: +30.4%")
 
 with col3:
-    st.success("### Giai đoạn 3: Hybrid hoàn chỉnh\n\n"
+    st.success("### Этап 3: Полный гибрид\n\n"
                "**MiniLM + Graph + Propagation**\n\n"
-               "- Sentence Transformer (384 chiều)\n"
-               "- Feature Fusion (402 chiều)\n"
+               "- Sentence Transformer (384 измерения)\n"
+               "- Слияние признаков (402 измерения)\n"
                "- Accuracy 98.11%\n"
                "- Rumor Recall 96.46%")
 
 st.markdown("---")
 
 # Pipeline Architecture
-st.subheader("🏗️ Kiến trúc Pipeline hoàn chỉnh")
+st.subheader("🏗️ Полная архитектура конвейера")
 
 st.markdown("""
 ```
-Dữ liệu PHEME thô (5 Sự kiện, 5,802 Threads, 103,212 Tweets)
+Сырые данные PHEME (5 событий, 5,802 Threads, 103,212 Tweets)
     │
-    ├── Preprocessing Pipeline
-    │   ├── Phân tích Thread (Source + Reactions)
-    │   ├── Chuẩn hóa & làm sạch
-    │   └── Trích xuất Propagation Features
+    ├── Конвейер предобработки
+    │   ├── Анализ Thread (Source + Reactions)
+    │   ├── Нормализация и очистка
+    │   └── Извлечение признаков распространения
     │
-    ├── Knowledge Graph Construction
-    │   ├── Ontology V1 (Classes: Post, User, Event, Thread)
-    │   ├── Ontology V2 (Subclasses: SourcePost, ReplyPost)
-    │   ├── Sinh RDF Triples (76,066 nodes, 65,565 edges)
-    │   └── Phát hiện & loại bỏ Cycle
+    ├── Построение Графа знаний
+    │   ├── Ontology V1 (Классы: Post, User, Event, Thread)
+    │   ├── Ontology V2 (Подклассы: SourcePost, ReplyPost)
+    │   ├── Генерация RDF Triple (76,066 nodes, 65,565 edges)
+    │   └── Обнаружение и удаление циклов
     │
-    ├── Graph Feature Extraction
-    │   ├── Node Centrality (PageRank, Degree, Betweenness)
-    │   ├── User Reputation (Rumor Ratio, Post Count)
-    │   ├── Thread Structure (Subtree Size, Sibling Count)
-    │   └── Source Authority (Credibility, Network Size)
+    ├── Извлечение признаков графа
+    │   ├── Центральность узлов (PageRank, Degree, Betweenness)
+    │   ├── Репутация пользователя (Rumor Ratio, Post Count)
+    │   ├── Структура Thread (Subtree Size, Sibling Count)
+    │   └── Авторитет источника (Credibility, Network Size)
     │
-    ├── Semantic Embedding (MiniLM)
-    │   └── 384 chiều Sentence Embeddings
+    ├── Семантические эмбеддинги (MiniLM)
+    │   └── 384-мерные Sentence Embeddings
     │
-    └── Hybrid Classifier
-        ├── Feature Fusion (402 hoặc 5,398 chiều)
+    └── Гибридный классификатор
+        ├── Слияние признаков (402 или 5,398 измерений)
         ├── Logistic Regression
-        └── Kết quả: Rumor / Non-Rumor
+        └── Результат: Слух / Не слух
 ```
 """)
 
 st.markdown("---")
 
 # Performance Summary
-st.subheader("📈 Sự tiến hóa về hiệu năng")
+st.subheader("📈 Эволюция производительности")
 
 metrics_df = load_final_metrics()
 if metrics_df is not None:
@@ -115,18 +115,18 @@ if metrics_df is not None:
 
     col1, col2, col3, col4 = st.columns(4)
     with col1:
-        st.metric("Baseline Recall", f"{metrics_df['Recall'].iloc[0]:.1%}")
+        st.metric("Базовый Recall", f"{metrics_df['Recall'].iloc[0]:.1%}")
     with col2:
         best_recall = metrics_df['Recall'].max()
         best_model = metrics_df.loc[metrics_df['Recall'].idxmax(), 'Model']
-        st.metric("Recall tốt nhất", f"{best_recall:.1%}", delta=f"+{best_recall - metrics_df['Recall'].iloc[0]:.1%}")
+        st.metric("Лучший Recall", f"{best_recall:.1%}", delta=f"+{best_recall - metrics_df['Recall'].iloc[0]:.1%}")
     with col3:
-        st.metric("Accuracy tốt nhất", f"{metrics_df['Accuracy'].max():.1%}")
+        st.metric("Лучшая Accuracy", f"{metrics_df['Accuracy'].max():.1%}")
     with col4:
         fn_reduction = metrics_df['FN'].iloc[0] - metrics_df['FN'].iloc[-1]
-        st.metric("Giảm FN", f"{fn_reduction:,}", delta=f"-{fn_reduction:,}")
+        st.metric("Снижение FN", f"{fn_reduction:,}", delta=f"-{fn_reduction:,}")
 else:
-    st.info("Chạy Pipeline huấn luyện để tạo final_metrics_table.csv")
+    st.info("Запустите конвейер обучения для создания final_metrics_table.csv")
 
 st.markdown("---")
-st.caption("Rumor Detection Thesis — Trường Đại học Nha Trang (NTU)")
+st.caption("Дипломная работа по обнаружению слухов — Университет Нячанга (NTU)")

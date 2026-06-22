@@ -20,20 +20,20 @@ from ui.components.data_loader import (
 )
 from ui.components.model_manager import predict_v2, predict_v1, load_v1_model, load_v2_model
 
-st.title("🕵️ Rumor Detection")
+st.title("🕵️ Обнаружение слухов")
 st.markdown("---")
 
 # ============================================================
 # SIDEBAR
 # ============================================================
-st.sidebar.title("Cài đặt dự đoán")
+st.sidebar.title("Настройки предсказания")
 
 # Model version selector
 model_version = st.sidebar.radio(
-    "Phiên bản mô hình",
-    ["V2 (Thread-Level) — Khuyến nghị", "V1 (Post-Level)"],
+    "Версия модели",
+    ["V2 (Thread-Level) — Рекомендуется", "V1 (Post-Level)"],
     index=0,
-    help="V2 sử dụng MiniLM + Propagation + Graph (402 chiều). V1 sử dụng TF-IDF + MiniLM + Graph (5,398 chiều)."
+    help="V2 использует MiniLM + Propagation + Graph (402 измерения). V1 использует TF-IDF + MiniLM + Graph (5,398 измерений)."
 )
 
 is_v2 = "V2" in model_version
@@ -42,18 +42,18 @@ is_v2 = "V2" in model_version
 samples = get_sample_threads()
 
 if len(samples) == 0:
-    st.error("Không tìm thấy mẫu cuộc hội thoại. Chạy Pipeline huấn luyện trước.")
+    st.error("Образцы диалогов не найдены. Сначала запустите конвейер обучения.")
     st.stop()
 
 # Create thread selector
 thread_options = {}
 for s in samples:
     label_emoji = "🔴" if s['label'] == 'Rumor' else "🟢"
-    display = f"{label_emoji} Thread {s['thread_id']} — {s['label']} ({s['num_posts']} bài đăng)"
+    display = f"{label_emoji} Thread {s['thread_id']} — {s['label']} ({s['num_posts']} сообщений)"
     thread_options[display] = s
 
 selected_display = st.sidebar.selectbox(
-    "Chọn cuộc hội thoại mẫu",
+    "Выберите образец диалога",
     options=list(thread_options.keys()),
     index=0
 )
@@ -62,7 +62,7 @@ selected_thread = thread_options[selected_display]
 thread_id = selected_thread['thread_id']
 
 # Analyze button
-analyze = st.sidebar.button("🔍 Phân tích cuộc hội thoại", type="primary", use_container_width=True)
+analyze = st.sidebar.button("🔍 Анализировать диалог", type="primary", use_container_width=True)
 
 # ============================================================
 # MAIN AREA
@@ -72,28 +72,28 @@ col1, col2, col3, col4 = st.columns(4)
 with col1:
     st.metric("Thread ID", f"{thread_id}")
 with col2:
-    st.metric("Nhãn thật", selected_thread['label'],
-              delta="Rumor" if selected_thread['label'] == 'Rumor' else "Non-Rumor",
+    st.metric("Истинная метка", selected_thread['label'],
+              delta="Слух" if selected_thread['label'] == 'Rumor' else "Не слух",
               delta_color="inverse" if selected_thread['label'] == 'Rumor' else "normal")
 with col3:
-    st.metric("Bài đăng", selected_thread['num_posts'])
+    st.metric("Сообщений", selected_thread['num_posts'])
 with col4:
-    st.metric("Mô hình", "V2 (402 chiều)" if is_v2 else "V1 (5,398 chiều)")
+    st.metric("Модель", "V2 (402 измерения)" if is_v2 else "V1 (5,398 измерений)")
 
-st.markdown(f"**Văn bản nguồn**: {selected_thread['source_text']}")
+st.markdown(f"**Исходный текст**: {selected_thread['source_text']}")
 
 if analyze:
     thread_posts = get_thread_data(thread_id)
 
     if thread_posts is None or len(thread_posts) == 0:
-        st.error(f"Không tìm thấy dữ liệu cho Thread {thread_id}")
+        st.error(f"Данные для Thread {thread_id} не найдены")
         st.stop()
 
-    with st.spinner("Đang thực hiện dự đoán..."):
+    with st.spinner("Выполнение предсказания..."):
         if is_v2:
             features = get_v2_features_for_thread(thread_id)
             if features is None:
-                st.error("Không tìm thấy đặc trưng cho cuộc hội thoại này.")
+                st.error("Признаки для этого диалога не найдены.")
                 st.stop()
 
             graph_features, prop_features = features
@@ -111,37 +111,37 @@ if analyze:
             pred, confidence, inference_time, n_features = predict_v1(post_id, text)
 
     if pred is None:
-        st.warning("⚠️ Không tìm thấy file mô hình. Chạy `scripts/train_and_save_v1.py` và/hoặc `scripts/train_and_save_v2.py` trước.")
+        st.warning("⚠️ Файлы моделей не найдены. Сначала запустите `scripts/train_and_save_v1.py` и/или `scripts/train_and_save_v2.py`.")
         st.stop()
 
     # ============================================================
     # RESULTS
     # ============================================================
     st.markdown("---")
-    st.subheader("📊 Kết quả dự đoán")
+    st.subheader("📊 Результат предсказания")
 
     # Result cards
     result_col1, result_col2, result_col3 = st.columns(3)
 
     with result_col1:
-        prediction_label = "🔴 Rumor" if pred == 1 else "🟢 Non-Rumor"
-        st.markdown(f"### Kết quả dự đoán\n# {prediction_label}")
+        prediction_label = "🔴 Слух" if pred == 1 else "🟢 Не слух"
+        st.markdown(f"### Результат\n# {prediction_label}")
 
     with result_col2:
-        st.markdown(f"### Độ tin cậy\n# {confidence:.2%}")
+        st.markdown(f"### Уверенность\n# {confidence:.2%}")
         st.progress(float(confidence))
 
     with result_col3:
-        st.markdown(f"### Chi tiết\n"
-                    f"**Đặc trưng**: {n_features:,} chiều\n"
-                    f"**Thời gian suy luận**: {inference_time:.1f} ms\n"
-                    f"**Mô hình**: {'V2 (Thread-Level)' if is_v2 else 'V1 (Post-Level)'}")
+        st.markdown(f"### Детали\n"
+                    f"**Признаков**: {n_features:,} измерений\n"
+                    f"**Время вывода**: {inference_time:.1f} ms\n"
+                    f"**Модель**: {'V2 (Thread-Level)' if is_v2 else 'V1 (Post-Level)'}")
 
     # ============================================================
     # CONVERSATION THREAD
     # ============================================================
     st.markdown("---")
-    st.subheader("💬 Cuộc hội thoại")
+    st.subheader("💬 Диалог")
 
     thread_posts_sorted = thread_posts.sort_values(['depth', 'time'] if 'time' in thread_posts.columns else ['depth', 'post_id'])
 
@@ -151,17 +151,17 @@ if analyze:
         indent = " " * depth
 
         if is_source:
-            st.markdown(f"**{indent}📌 Bài đăng gốc** (depth={depth})")
+            st.markdown(f"**{indent}📌 Исходное сообщение** (depth={depth})")
         else:
             parent_info = ""
             if 'reply_to' in post and pd.notna(post['reply_to']):
-                parent_info = f" ↳ trả lời {int(float(post['reply_to']))}"
-            st.markdown(f"**{indent}💬 Trả lời**{parent_info} (depth={depth})")
+                parent_info = f" ↳ ответ на {int(float(post['reply_to']))}"
+            st.markdown(f"**{indent}💬 Ответ**{parent_info} (depth={depth})")
 
         st.markdown(f"{indent}> {str(post['text'][:200])}")
 
         if depth >= 3:
-            st.markdown(f"{indent}*... (các trả lời sâu hơn được ẩn để dễ đọc)*")
+            st.markdown(f"{indent}*... (более глубокие ответы скрыты для удобства чтения)*")
             break
 
     # ============================================================
@@ -169,20 +169,20 @@ if analyze:
     # ============================================================
     if is_v2:
         st.markdown("---")
-        st.subheader("🔧 Khám phá đặc trưng")
+        st.subheader("🔧 Изучение признаков")
 
         tab1, tab2 = st.tabs(["Graph Features (14)", "Propagation Features (4)"])
 
         with tab1:
             if features:
                 gf = features[0]
-                gf_df = pd.DataFrame(list(gf.items()), columns=['Đặc trưng', 'Giá trị'])
+                gf_df = pd.DataFrame(list(gf.items()), columns=['Признак', 'Значение'])
                 st.dataframe(gf_df, use_container_width=True, hide_index=True)
 
         with tab2:
             if features:
                 pf = features[1]
-                pf_df = pd.DataFrame(list(pf.items()), columns=['Đặc trưng', 'Giá trị'])
+                pf_df = pd.DataFrame(list(pf.items()), columns=['Признак', 'Значение'])
                 st.dataframe(pf_df, use_container_width=True, hide_index=True)
 
     # ============================================================
@@ -190,9 +190,9 @@ if analyze:
     # ============================================================
     else:
         st.markdown("---")
-        st.subheader("🔧 Khám phá đặc trưng")
-        st.info("V1 sử dụng 5,000 TF-IDF + 384 MiniLM + 14 Graph Features = 5,398 tổng cộng. "
-                "TF-IDF Features là vector thưa (sparse) với số chiều cao.")
+        st.subheader("🔧 Изучение признаков")
+        st.info("V1 использует 5,000 TF-IDF + 384 MiniLM + 14 Graph Features = 5,398 всего. "
+                "TF-IDF признаки — это разреженный вектор высокой размерности.")
 
         graph_cols = [
             'node_in_degree', 'node_out_degree', 'pagerank_score',
@@ -212,20 +212,20 @@ if analyze:
             g_row = df_graph[df_graph['post_id'] == post_id]
             if len(g_row) > 0:
                 g_df = pd.DataFrame({
-                    'Đặc trưng': graph_cols,
-                    'Giá trị': [float(g_row[c].iloc[0]) for c in graph_cols]
+                    'Признак': graph_cols,
+                    'Значение': [float(g_row[c].iloc[0]) for c in graph_cols]
                 })
                 st.dataframe(g_df, use_container_width=True, hide_index=True)
         except:
-            st.info("Graph Features có sẵn sau khi chạy Pipeline huấn luyện.")
+            st.info("Graph Features доступны после запуска конвейера обучения.")
 
 else:
-    st.info("👈 Chọn một cuộc hội thoại từ thanh bên và nhấn **Phân tích cuộc hội thoại** để chạy trình diễn.")
+    st.info("👈 Выберите диалог из боковой панели и нажмите **Анализировать диалог** для запуска демонстрации.")
     st.markdown("""
-    ### Cách hoạt động
+    ### Как это работает
 
-    1. **V2 (Khuyến nghị)**: 402 đặc trưng = 384 MiniLM Embeddings + 4 Propagation Features + 14 Graph Topology Features
-    2. **V1**: 5,398 đặc trưng = 5,000 TF-IDF + 384 MiniLM + 14 Graph Features
+    1. **V2 (Рекомендуется)**: 402 признака = 384 MiniLM Embeddings + 4 Propagation Features + 14 Graph Topology Features
+    2. **V1**: 5,398 признаков = 5,000 TF-IDF + 384 MiniLM + 14 Graph Features
 
-    Mô hình phân loại các cuộc hội thoại là **Rumor** hoặc **Non-Rumor** kèm điểm tin cậy.
+    Модель классифицирует диалоги как **Слух** или **Не слух** с указанием уровня уверенности.
     """)
